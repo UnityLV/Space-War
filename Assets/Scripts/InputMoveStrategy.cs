@@ -1,19 +1,21 @@
 ﻿using System.Linq;
 using UnityEngine;
 
-public class InputMoveStrategy : IMoveStrategy
+public class InputMoveStrategy : IMoveStrategy 
 {
     private readonly IBoardObject _boardObject;
     private int _speed = 10;
+    private readonly IKeyboardInputSource _keyboardInputSource;
 
-    public InputMoveStrategy(IBoardObject boardObject)
+    public InputMoveStrategy(IBoardObject boardObject,IKeyboardInputSource keyboardInputSource)
     {
         _boardObject = boardObject;
+        _keyboardInputSource =  keyboardInputSource;
     }
 
     public void Move()
     {
-        Vector2 input = InputReader.ReadInput();
+        Vector2 input = new Vector2(_keyboardInputSource.GetInput().X, _keyboardInputSource.GetInput().Y);
         input *= _speed * IMoveStrategy.SpeedFactor;
         _boardObject.Position += input;
     }
