@@ -2,3 +2,8 @@
 {
     KeyboardInputData GetInput();
 }
+
+public interface IMouseInputSource
+{
+    MouseInputData GetInput();
+}

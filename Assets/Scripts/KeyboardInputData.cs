@@ -14,3 +14,16 @@ public struct KeyboardInputData
     }
 }
 
+[Serializable]
+public struct MouseInputData
+{
+    public float Time;
+    public float X;
+    public float Y;
+    public bool LeftButton;
+
+    public override string ToString()
+    {
+        return $"Time: {Time}, Input: {X} : {Y} : {LeftButton}";
+    }
+}

@@ -1,14 +1,17 @@
 ﻿using UnityEngine;
 
-public class KeyboardInputConsumer : IKeyboardInputSource , ITickable
+public class KeyboardInputConsumer : IKeyboardInputSource, IMouseInputSource, ITickable
 {
     private readonly IInputQueueSource _inputQueueSource;
-    private KeyboardInputData _inputData;
+
+    private KeyboardInputData _inputDataKeyboard;
+    private MouseInputData _inputDataMouse;
+
     public KeyboardInputConsumer(IInputQueueSource inputQueueSource)
     {
         _inputQueueSource = inputQueueSource;
     }
-    
+
     public void Tick()
     {
         Consume();
@@ -16,13 +19,25 @@ public class KeyboardInputConsumer : IKeyboardInputSource , ITickable
 
     private void Consume()
     {
-        while (_inputQueueSource.InputQueue.Count > 0)
+        while (_inputQueueSource.KeyboardInputQueue.Count > 0)
         {
-            KeyboardInputData data = _inputQueueSource.InputQueue.Peek();
-            if (data.Time < Tools.StartGameTime())
+            KeyboardInputData data = _inputQueueSource.KeyboardInputQueue.Peek();
+            if (data.Time < TimeInGame.TimeFromStart())
             {
-                _inputData = _inputQueueSource.InputQueue.Dequeue();
-                Debug.Log(_inputData);
+                _inputDataKeyboard = _inputQueueSource.KeyboardInputQueue.Dequeue();
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        while (_inputQueueSource.MouseInputQueue.Count > 0)
+        {
+            MouseInputData data = _inputQueueSource.MouseInputQueue.Peek();
+            if (data.Time < TimeInGame.TimeFromStart())
+            {
+                _inputDataMouse = _inputQueueSource.MouseInputQueue.Dequeue();
             }
             else
             {
@@ -31,8 +46,13 @@ public class KeyboardInputConsumer : IKeyboardInputSource , ITickable
         }
     }
 
-    public KeyboardInputData GetInput()
+    KeyboardInputData IKeyboardInputSource.GetInput()
     {
-        return _inputData;
+        return _inputDataKeyboard;
+    }
+
+    MouseInputData IMouseInputSource.GetInput()
+    {
+        return _inputDataMouse;
     }
 }

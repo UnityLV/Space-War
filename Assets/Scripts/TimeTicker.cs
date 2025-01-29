@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class TimeTicker : ITickable
@@ -108,10 +109,26 @@ public class DistanceTrigger : ConditionTriggerTicker
     }
 }
 
-public class MouseClickTriggerTicker : ConditionTriggerTicker
+public class MouseClickTriggerTicker : ITickable
 {
-    public MouseClickTriggerTicker(Delegate action) : base(() => Input.GetMouseButtonDown(0), () => action.DynamicInvoke())
+    private readonly Delegate _action;
+    private readonly IMouseInputSource _inputSource;
+    private bool _slickLastTime;
+    public MouseClickTriggerTicker( Delegate action,IMouseInputSource inputSource)
     {
+        _action = action;
+        _inputSource = inputSource;
+    }
+
+    public void Tick()
+    {
+        if (_inputSource.GetInput().LeftButton && !_slickLastTime)
+        {
+            _action.DynamicInvoke();
+        }
+
+        _slickLastTime = _inputSource.GetInput().LeftButton;
+
     }
 }
 

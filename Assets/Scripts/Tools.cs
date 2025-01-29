@@ -1,6 +1,23 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
+public static class TimeInGame
+{
+    
+    private static float _resetTimeCoefficient;
+    
+    public static float TimeFromStart()
+    {
+        return UnityEngine.Time.time - _resetTimeCoefficient;
+    }
+    
+    public static void ResetTime()
+    {
+        _resetTimeCoefficient = UnityEngine.Time.time;
+    }
+
+}
+
 public static class Tools
 {
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -21,18 +38,6 @@ public static class Tools
         return (AngleToVector2(Random.Range(0, 360)) * Random.Range(10, 20)) + screenCenter;
     }
 
-    private static float _resetTimeCoefficient;
-    
-    public static float StartGameTime()
-    {
-        return UnityEngine.Time.time - _resetTimeCoefficient;
-    }
-    
-    public static void ResetTime()
-    {
-        _resetTimeCoefficient = UnityEngine.Time.time;
-    }
-    
     public static Canvas GetCanvas()
     {
         GameObject canvasObject = GameObject.Find("Canvas");

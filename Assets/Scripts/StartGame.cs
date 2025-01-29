@@ -13,7 +13,6 @@ public class StartGame : IState
 
     public void Enter()
     {
-        Tools.ResetTime();
         Start();
     }
 
@@ -25,7 +24,7 @@ public class StartGame : IState
     private void Start()
     {
         InputRecorder.ClearData();
-        Tools.ResetTime();
+        TimeInGame.ResetTime();
         Tools.InitSeed();
         
         _game = new Game();
@@ -45,7 +44,7 @@ public class StartGame : IState
                 .SetBoard(board)
                 .AddBrainCell(boardObject => new ShipBoardObjectView(boardObject))
                 .AddBrainCell(boardObject => new InputMoveStrategy(boardObject, keyboardInputConsumer))
-                .AddBrainCell(boardObject => new CursorRotationStrategy(boardObject))
+                .AddBrainCell(boardObject => new CursorRotationStrategy(boardObject,keyboardInputConsumer))
                 .AddBrainCell(boardObject => new InertiaMoveStrategy(boardObject, keyboardInputConsumer))
                 .AddBrainCell(boardObject => new ConfinedMoveStrategy(boardObject, board))
                 .Build();
@@ -82,7 +81,7 @@ public class StartGame : IState
             .Build();
 
         _game.AddElement(TickManager.StartTickable(new TimeTicker(.5f, (Func<IBoardObject>)obstacleFactory.Spawn)));
-        _game.AddElement(TickManager.StartTickable(new MouseClickTriggerTicker((Func<IBoardObject>)projectileFactory.Spawn)));
+        _game.AddElement(TickManager.StartTickable(new MouseClickTriggerTicker((Func<IBoardObject>)projectileFactory.Spawn,keyboardInputConsumer)));
 
         _game.AddElement(projectileFactory);
         _game.AddElement(obstacleFactory);
