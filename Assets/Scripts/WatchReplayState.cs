@@ -30,18 +30,18 @@ public class WatchReplayState : IState
 
         IBoard board = new Board();
 
-        RecordedInputQueueSource runtimeInputQueueSource = new RecordedInputQueueSource();
-        KeyboardInputConsumer keyboardInputConsumer = new KeyboardInputConsumer(runtimeInputQueueSource);
+        IInputQueue runtimeInputQueue = new RecordedInputQueue();
+        InputQueueConsumer inputQueueConsumer = new InputQueueConsumer(runtimeInputQueue);
 
-        _game.AddElement((keyboardInputConsumer));
+        _game.AddElement((inputQueueConsumer));
 
         IBoardObjectFactory playerFactory =
             new BoardObjectFactoryBuilder()
                 .SetBoard(board)
                 .AddBrainCell(boardObject => new ShipBoardObjectView(boardObject))
-                .AddBrainCell(boardObject => new InputMoveStrategy(boardObject, keyboardInputConsumer))
-                .AddBrainCell(boardObject => new CursorRotationStrategy(boardObject,keyboardInputConsumer))
-                .AddBrainCell(boardObject => new InertiaMoveStrategy(boardObject, keyboardInputConsumer))
+                .AddBrainCell(boardObject => new InputMoveStrategy(boardObject, inputQueueConsumer))
+                .AddBrainCell(boardObject => new CursorRotationStrategy(boardObject,inputQueueConsumer))
+                .AddBrainCell(boardObject => new InertiaMoveStrategy(boardObject, inputQueueConsumer))
                 .AddBrainCell(boardObject => new ConfinedMoveStrategy(boardObject, board))
                 .Build();
         IBoardObject player = playerFactory.Spawn();
@@ -77,7 +77,7 @@ public class WatchReplayState : IState
             .Build();
 
         _game.AddElement(TickManager.StartTickable(new TimeTicker(.5f, (Func<IBoardObject>)obstacleFactory.Spawn)));
-        _game.AddElement(TickManager.StartTickable(new MouseClickTriggerTicker((Func<IBoardObject>)projectileFactory.Spawn,keyboardInputConsumer)));
+        _game.AddElement(TickManager.StartTickable(new MouseClickTriggerTicker((Func<IBoardObject>)projectileFactory.Spawn,inputQueueConsumer)));
 
         _game.AddElement(projectileFactory);
         _game.AddElement(obstacleFactory);

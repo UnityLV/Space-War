@@ -6,21 +6,21 @@ using UnityEngine;
 
 public class InputRecorder : ITickable, IDisposable
 {
-    private readonly IInputQueueSource _inputQueueSource;
+    private readonly IInputQueue _inputQueue;
 
     private static readonly string FilePath = Path.Combine(Application.dataPath, "inputEvents.dat");
     private List<KeyboardInputData> _dataList = new List<KeyboardInputData>();
     private List<MouseInputData> _mouseDataList = new List<MouseInputData>();
     private float _lastRecordTime = -1;
 
-    public InputRecorder(IInputQueueSource inputQueueSource)
+    public InputRecorder(IInputQueue inputQueue)
     {
-        _inputQueueSource = inputQueueSource;
+        _inputQueue = inputQueue;
     }
 
     public void Tick()
     {
-        foreach (var data in _inputQueueSource.KeyboardInputQueue)
+        foreach (var data in _inputQueue.KeyboardInputQueue)
         {
             if (data.Time > _lastRecordTime)
             {
@@ -33,7 +33,7 @@ public class InputRecorder : ITickable, IDisposable
             }
         }
 
-        foreach (var data in _inputQueueSource.MouseInputQueue)
+        foreach (var data in _inputQueue.MouseInputQueue)
         {
             if (data.Time > _lastRecordTime)
             {

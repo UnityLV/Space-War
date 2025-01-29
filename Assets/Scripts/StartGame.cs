@@ -30,22 +30,21 @@ public class StartGame : IState
         _game = new Game();
 
         IBoard board = new Board();
-
-        RuntimeInputQueueSource runtimeInputQueueSource = new RuntimeInputQueueSource();
-        _game.AddElement(runtimeInputQueueSource);
         
-        KeyboardInputConsumer keyboardInputConsumer = new KeyboardInputConsumer(runtimeInputQueueSource);
+        IInputQueue runtimeInputQueue = new RuntimeInputQueue();
+        InputQueueConsumer inputQueueConsumer = new InputQueueConsumer(runtimeInputQueue);
 
-        _game.AddElement((keyboardInputConsumer));
-        _game.AddElement((ITickable)new InputRecorder(runtimeInputQueueSource));
+        _game.AddElement(runtimeInputQueue);
+        _game.AddElement(inputQueueConsumer);
+        _game.AddElement(new InputRecorder(runtimeInputQueue));
 
         IBoardObjectFactory playerFactory =
             new BoardObjectFactoryBuilder()
                 .SetBoard(board)
                 .AddBrainCell(boardObject => new ShipBoardObjectView(boardObject))
-                .AddBrainCell(boardObject => new InputMoveStrategy(boardObject, keyboardInputConsumer))
-                .AddBrainCell(boardObject => new CursorRotationStrategy(boardObject,keyboardInputConsumer))
-                .AddBrainCell(boardObject => new InertiaMoveStrategy(boardObject, keyboardInputConsumer))
+                .AddBrainCell(boardObject => new InputMoveStrategy(boardObject, inputQueueConsumer))
+                .AddBrainCell(boardObject => new CursorRotationStrategy(boardObject,inputQueueConsumer))
+                .AddBrainCell(boardObject => new InertiaMoveStrategy(boardObject, inputQueueConsumer))
                 .AddBrainCell(boardObject => new ConfinedMoveStrategy(boardObject, board))
                 .Build();
         IBoardObject player = playerFactory.Spawn();
@@ -67,8 +66,7 @@ public class StartGame : IState
         IBoardObjectFactory projectileFactory = new BoardObjectFactoryBuilder()
             .SetBoard(board)
             .AddBrainCell(boardObject => new ProjectileBoardObjectView(boardObject))
-            .AddBrainCell(boardObject =>
-                boardObject.Position = player.Position + Tools.AngleToVector2(player.Rotation) * 1.5f)
+            .AddBrainCell(boardObject => boardObject.Position = player.Position + Tools.AngleToVector2(player.Rotation) * 1.5f)
             .AddBrainCell(boardObject => boardObject.Rotation = player.Rotation)
             .AddBrainCell(boardObject => new TimeTrigger(1, boardObject.Dispose))
             .AddBrainCell(boardObject => new DirectionMoveStrategy(boardObject, Tools.AngleToVector2(player.Rotation)))
@@ -81,7 +79,7 @@ public class StartGame : IState
             .Build();
 
         _game.AddElement(TickManager.StartTickable(new TimeTicker(.5f, (Func<IBoardObject>)obstacleFactory.Spawn)));
-        _game.AddElement(TickManager.StartTickable(new MouseClickTriggerTicker((Func<IBoardObject>)projectileFactory.Spawn,keyboardInputConsumer)));
+        _game.AddElement(TickManager.StartTickable(new MouseClickTriggerTicker((Func<IBoardObject>)projectileFactory.Spawn,inputQueueConsumer)));
 
         _game.AddElement(projectileFactory);
         _game.AddElement(obstacleFactory);

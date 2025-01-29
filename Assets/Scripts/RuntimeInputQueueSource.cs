@@ -2,18 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IInputQueueSource
+public interface IInputQueue
 {
     Queue<KeyboardInputData> KeyboardInputQueue { get; }
     Queue<MouseInputData> MouseInputQueue { get; }
 }
 
-public class RecordedInputQueueSource : IInputQueueSource
+public class RecordedInputQueue : IInputQueue
 {
     public Queue<KeyboardInputData> KeyboardInputQueue { get; }
     public Queue<MouseInputData> MouseInputQueue { get; }
 
-    public RecordedInputQueueSource()
+    public RecordedInputQueue()
     {
         KeyboardInputQueue = new Queue<KeyboardInputData>(InputRecorder.LoadData());
         MouseInputQueue = new Queue<MouseInputData>(InputRecorder.LoadMouseData());
@@ -21,7 +21,7 @@ public class RecordedInputQueueSource : IInputQueueSource
     }
 }
 
-public class RuntimeInputQueueSource : ITickable, IInputQueueSource
+public class RuntimeInputQueue : ITickable, IInputQueue
 {
     public Queue<KeyboardInputData> KeyboardInputQueue { get; } = new Queue<KeyboardInputData>();
     public Queue<MouseInputData> MouseInputQueue { get; } = new Queue<MouseInputData>();

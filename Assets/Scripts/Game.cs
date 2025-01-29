@@ -5,23 +5,15 @@ public class Game
 {
     private List<IDisposable> _someGameShit = new();
 
-    public void AddElement(IDisposable disposable)
+    public void AddElement(object element)
     {
-        if (disposable is ITickable tickable)
-        {
-            _someGameShit.Add(TickManager.StartTickable(tickable));
-        }
-
-        _someGameShit.Add(disposable);
-    }
-
-    public void AddElement(ITickable tickable)
-    {
-        _someGameShit.Add(TickManager.StartTickable(tickable));
-
-        if (tickable is IDisposable disposable)
+        if (element is IDisposable disposable)
         {
             _someGameShit.Add(disposable);
+        }
+        if (element is ITickable tickable)
+        {
+            _someGameShit.Add(TickManager.StartTickable(tickable));
         }
     }
 

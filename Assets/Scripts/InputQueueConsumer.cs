@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
 
-public class KeyboardInputConsumer : IKeyboardInputSource, IMouseInputSource, ITickable
+public class InputQueueConsumer : IKeyboardInputSource, IMouseInputSource, ITickable
 {
-    private readonly IInputQueueSource _inputQueueSource;
+    private readonly IInputQueue _inputQueue;
 
     private KeyboardInputData _inputDataKeyboard;
     private MouseInputData _inputDataMouse;
 
-    public KeyboardInputConsumer(IInputQueueSource inputQueueSource)
+    public InputQueueConsumer(IInputQueue inputQueue)
     {
-        _inputQueueSource = inputQueueSource;
+        _inputQueue = inputQueue;
     }
 
     public void Tick()
@@ -19,12 +19,12 @@ public class KeyboardInputConsumer : IKeyboardInputSource, IMouseInputSource, IT
 
     private void Consume()
     {
-        while (_inputQueueSource.KeyboardInputQueue.Count > 0)
+        while (_inputQueue.KeyboardInputQueue.Count > 0)
         {
-            KeyboardInputData data = _inputQueueSource.KeyboardInputQueue.Peek();
+            KeyboardInputData data = _inputQueue.KeyboardInputQueue.Peek();
             if (data.Time < TimeInGame.TimeFromStart())
             {
-                _inputDataKeyboard = _inputQueueSource.KeyboardInputQueue.Dequeue();
+                _inputDataKeyboard = _inputQueue.KeyboardInputQueue.Dequeue();
             }
             else
             {
@@ -32,12 +32,12 @@ public class KeyboardInputConsumer : IKeyboardInputSource, IMouseInputSource, IT
             }
         }
 
-        while (_inputQueueSource.MouseInputQueue.Count > 0)
+        while (_inputQueue.MouseInputQueue.Count > 0)
         {
-            MouseInputData data = _inputQueueSource.MouseInputQueue.Peek();
+            MouseInputData data = _inputQueue.MouseInputQueue.Peek();
             if (data.Time < TimeInGame.TimeFromStart())
             {
-                _inputDataMouse = _inputQueueSource.MouseInputQueue.Dequeue();
+                _inputDataMouse = _inputQueue.MouseInputQueue.Dequeue();
             }
             else
             {
